@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component jdk="1.8" jdk_type="JavaSDK">
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<lib name="musicg-1.4.2.0.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/musicg-1.4.2.0.jar!/"/>
+	</lib>
+	<lib name="jfreechart-1.0.19.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar!/"/>
+	</lib>
+	<lib name="jfreechart-1.0.19-experimental.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/jfreechart-1.0.19/lib/jfreechart-1.0.19-experimental.jar!/"/>
+	</lib>
+	<lib name="jfreechart-1.0.19-swt.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/jfreechart-1.0.19/lib/jfreechart-1.0.19-swt.jar!/"/>
+	</lib>
+	<lib name="jfreesvg-2.0.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/jfreechart-1.0.19/lib/jfreesvg-2.0.jar!/"/>
+	</lib>
+	<lib name="hamcrest-core-1.3.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/jfreechart-1.0.19/lib/hamcrest-core-1.3.jar!/"/>
+	</lib>
+	<lib name="jcommon-1.0.23.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/jfreechart-1.0.19/lib/jcommon-1.0.23.jar!/"/>
+	</lib>
+	<lib name="junit-4.11.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/jfreechart-1.0.19/lib/junit-4.11.jar!/"/>
+	</lib>
+	<lib name="orsoncharts-1.4-eval-nofx.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/jfreechart-1.0.19/lib/orsoncharts-1.4-eval-nofx.jar!/"/>
+	</lib>
+	<lib name="orsonpdf-1.6-eval.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/jfreechart-1.0.19/lib/orsonpdf-1.6-eval.jar!/"/>
+	</lib>
+	<lib name="servlet.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/jfreechart-1.0.19/lib/servlet.jar!/"/>
+	</lib>
+	<lib name="swtgraphics2d.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/jfreechart-1.0.19/lib/swtgraphics2d.jar!/"/>
+	</lib>
+</component>
