@@ -2,6 +2,7 @@ package uniba.warpingtester.view;
 
 
 import java.io.File;
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
 
@@ -127,7 +129,8 @@ public class MainController {
 				listOfComputedFiles.add(computedSeriesFile);
 			}
 			
-			calculateStableAreas(listOfComputedFiles);
+			//calculateStableAreas(listOfComputedFiles);
+            correlationWithoutZones(listOfComputedFiles);
 			
 			/*
 			 * Creazione di array (serie) float e double per diversi algoritmi DTW
@@ -150,13 +153,7 @@ public class MainController {
 				secondFileMatrixd[i] = seriesSecondFile.getY(i).doubleValue();
 				}
 			
-			/*
-			 * DTW primo algoritmo (Chee Youl Gun).
-			 */
-			
-		
-			DTW dtw = new DTW(firstFileMatrix, secondFileMatrix);
-			
+
 			/*
 			 * DTW Maestre
 			 */
@@ -189,16 +186,11 @@ public class MainController {
 	
 	
 	private void calculateStableAreas(ArrayList<XYSeries> listOfFiles) {
-		
-		/*
-		 * This method creates an array of 42 distance every 100 Hz
-		 * 
-		 * 			|LowerBound | HigherBound |Distance|
-		 * 			| 0         |   100       | 12     |
-		 * 			| 101       |   200       | 0      |
-		 * 			
-		 */
-		
+
+        /**
+         * Metodo per calcolare zone stabili
+          */
+
 		XYSeries first = listOfFiles.get(0);
 		XYSeries second = listOfFiles.get(1);
 		
@@ -224,18 +216,31 @@ public class MainController {
 			aaa++;
 			i = i+100;
 		}
-		
-		
+
 		double sum = 0;
 		
 		for(double dist : distances) {
 			sum+=dist;
 		}
-		
-		double average = sum/distances.length;
+
+        /**
+         * Calcola media distanza media tra tutte le zone
+         */
+
+        double average = sum/distances.length;
+
 		int n = 1;
 		double areas[][] = new double [50][3];
-				
+
+        /*
+		 * Calcola la seguente matrice
+		 *
+		 * 			|LowerBound | HigherBound |Distance|
+		 * 			| 0         |   100       | 12     |
+		 * 			| 101       |   200       | 0      |
+		 *
+		 */
+
 		for (int x = 0; x < distances.length; x++) {
 			areas[x][0] = n;
 			areas[x][1] = n+99;
@@ -244,7 +249,16 @@ public class MainController {
 		}
 		
 		double stableAreas[][] = new double [50][3];
-		
+
+         /*
+		 * Calcola la matrice delle zone stabili
+		 *
+		 * 			|LowerBound | HigherBound |Distance|
+		 * 			| 0         |   100       | 12     |
+		 * 			| 101       |   200       | 0      |
+		 *
+		 */
+
 		n = 1;
 		int index = 0;
 		for (int x = 0; x < distances.length; x++) {
@@ -262,7 +276,51 @@ public class MainController {
 		for(int p = 0; p < 50; p++) {
 			System.out.println(stableAreas[p][0] + " | " +stableAreas[p][1] + " | " +stableAreas[p][2]);
 		}
-			
+	}
+
+	private void correlationWithoutZones(ArrayList<XYSeries> listOfFiles) {
+
+        /**
+         * Correlazione tra tutti i file.
+         * 1. Calcola la correlazione tra i due punti per ogni punto Y
+         * 2. Se la correlazione compresa nell'intervallo [-1, -0.95] U [0.95, 1] "salva" i valori
+         * 3. Calcola la correlazione tra i valori compresi all'interno di quel range.
+         *
+         *
+         */
+
+        XYSeries first = listOfFiles.get(0);
+		XYSeries second = listOfFiles.get(1);
+
+		double[] firstValue = new double[2];
+		double[] secondValue = new double[2];
+		ArrayList<Double> s1_arr = new ArrayList<>();
+		ArrayList<Double> s2_arr = new ArrayList<>();
+		PearsonsCorrelation p = new PearsonsCorrelation();
+
+
+		for(int j = 0; j < first.getItemCount(); j++) {
+            if(first.getX(j).doubleValue() < 5500) {
+                firstValue[0] = first.getY(j).doubleValue();
+                secondValue[0] = second.getY(j).doubleValue();
+                double corr = p.correlation(firstValue, secondValue);
+                if (corr < -0.95 || corr > 0.95) {
+                    s1_arr.add(firstValue[0]);
+                    s2_arr.add(secondValue[0]);
+                }
+            }
+		}
+
+        double[] s1_official = new double[s1_arr.size()];
+        double[] s2_official = new double[s2_arr.size()];
+
+        for(int i = 0; i < s1_arr.size(); i++){
+            s1_official[i] = s1_arr.get(i);
+            s2_official[i] = s2_arr.get(i);
+        }
+
+        System.out.println("Indice di correlazione " + p.correlation(s1_official, s2_official));
+
 	}
 	
 }
