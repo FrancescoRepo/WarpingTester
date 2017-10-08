@@ -38,4 +38,7 @@
 	<lib name="swtgraphics2d.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/jfreechart-1.0.19/lib/swtgraphics2d.jar!/"/>
 	</lib>
+	<lib name="commons-math3-3.6.1.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libraries/commons-math3-3.6.1.jar!/"/>
+	</lib>
 </component>
