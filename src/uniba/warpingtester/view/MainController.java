@@ -68,7 +68,7 @@ public class MainController {
 		
 		List<File> files = fc.showOpenMultipleDialog(null);
 		
-		if (files.size() > 0) {
+		if (files != null) {
 			for(File f : files) fileMap.putIfAbsent(f.getName(), f.getPath());
 			
 			List<String> fileNames = new ArrayList<String>();
@@ -76,9 +76,7 @@ public class MainController {
 			ObservableList names = FXCollections.observableArrayList(fileNames);
 			Collections.sort(names);
 			listMediaFile.setItems(names);
-		}	
-		
-		
+		}
 		
 	}
 	
