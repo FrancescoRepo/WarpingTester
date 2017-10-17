@@ -164,8 +164,8 @@ public class MainController {
 	      final TimeWarpInfo info = DTWPro.getWarpInfoBetween(a1, a2, distFn);
 	     
 	      System.out.println("Warp Distance Mestre: " + info.getDistance());
-			
-	      
+
+
 		/*
 		 * DTW secondo algoritmo
 		 */
@@ -177,11 +177,80 @@ public class MainController {
 			resultLabel.setText("Warp Distance: " + info.getDistance());
 			resultLabel.setVisible(true);	
 					
-						
+
+			calculateStableAreas(listOfComputedFiles);
+
+			//autoGenerateStableAreas(listOfComputedFiles);
 		}
 		
 	}
-	
+
+	private double[] getMinimumDistance(XYSeries first, XYSeries second){
+
+		double min = 0;
+		double hz = 0;
+		double position = 0;
+		int i = 8;
+		double sum = 0;
+		int count = 0;
+		while(first.getX(i).doubleValue() < 5500 && first.getX(i).doubleValue() > 50) {
+			double dist = Math.sqrt(Math.pow((first.getX(i).doubleValue() - second.getX(i).doubleValue()), 2) + Math.pow((first.getY(i).doubleValue() - second.getY(i).doubleValue()), 2));
+			if (i == 8) {
+				min = dist;
+				hz = first.getX(i).doubleValue();
+				position = i;
+
+			} else {
+				if (dist < min) {
+					min = dist;
+					hz = first.getX(i).doubleValue();
+					position = i;
+				}
+			}
+			sum += dist;
+			count++;
+			i++;
+		}
+		double average = sum/count;
+		System.out.println(average + "************************************************");
+
+		double[] result = new double[4];
+		result[0] = min;
+		result[1] = position;
+		result[2] = hz;
+		result[3] = average;
+
+		return result;
+	}
+
+	private void autoGenerateStableAreas(ArrayList<XYSeries> listOfFiles){
+
+		XYSeries first = listOfFiles.get(0);
+		XYSeries second = listOfFiles.get(1);
+
+		double[] result = getMinimumDistance(first, second);
+
+		double[][] area = new double[3][3];
+		area [0][0] = first.getX((int) result[1] -1).doubleValue();
+		area [0][1] = first.getX((int) result[1] ).doubleValue();
+		area [0][2] = first.getX((int) result[1] +1).doubleValue();
+
+		area [1][0] = first.getY((int) result[1] -1).doubleValue();
+		area [1][1] = first.getY((int) result[1]).doubleValue();
+		area [1][2] = first.getY((int) result[1] + 1).doubleValue();
+
+		area [2][0] = second.getY((int) result[1] -1 ).doubleValue();
+		area [2][1] = second.getY((int) result[1]).doubleValue();
+		area [2][2] = second.getY((int) result[1] +1).doubleValue();
+
+
+
+		System.out.println(area[0][0] + "\t" + area[0][1] + "\t" + area[0][2]);
+		System.out.println(area[1][0] + "\t" + area[1][1] + "\t" + area[1][2]);
+		System.out.println(area[2][0] + "\t" + area[2][1] + "\t" + area[2][2]);
+
+	}
+
 	
 	private void calculateStableAreas(ArrayList<XYSeries> listOfFiles) {
 
@@ -192,14 +261,14 @@ public class MainController {
 		XYSeries first = listOfFiles.get(0);
 		XYSeries second = listOfFiles.get(1);
 		
-		double[] distances = new double[43];
+		double[] distances = new double[56];
 		
 		int counter;
 		int aaa = 0;
 		int i = 1;
-		while(i < 4300) {
-			double[] s1 = new double[50];
-			double[] s2 = new double[50];
+		while(i < 5500) {
+			double[] s1 = new double[13];
+			double[] s2 = new double[13];
 			counter = 0;
 			for(int j = 0; j < first.getItemCount(); j++) {
 				if(first.getX(j).doubleValue() >= i && first.getX(j).doubleValue() <= i+99) {
@@ -228,7 +297,7 @@ public class MainController {
         double average = sum/distances.length;
 
 		int n = 1;
-		double areas[][] = new double [50][3];
+		double areas[][] = new double [100][3];
 
         /*
 		 * Calcola la seguente matrice
@@ -246,7 +315,7 @@ public class MainController {
 			n+=100;
 		}
 		
-		double stableAreas[][] = new double [50][3];
+		double stableAreas[][] = new double [100][3];
 
          /*
 		 * Calcola la matrice delle zone stabili
@@ -270,9 +339,18 @@ public class MainController {
 				n +=100;
 			}
 		}
-		
+
+		System.out.println("**********************" + average);
+		System.out.println("************************************************************************ ZONE");
+
 		for(int p = 0; p < 50; p++) {
-			System.out.println(stableAreas[p][0] + " | " +stableAreas[p][1] + " | " +stableAreas[p][2]);
+			System.out.println(areas[p][0] + " | " +areas[p][1] + " | " + areas[p][2]);
+		}
+
+		System.out.println("************************************************************************* ZONE STABILI");
+
+		for(int p = 0; p < 50; p++) {
+			System.out.println(stableAreas[p][0] + " | " +stableAreas[p][1] + " | " + stableAreas[p][2]);
 		}
 	}
 
