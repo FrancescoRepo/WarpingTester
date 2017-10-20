@@ -50,6 +50,8 @@ public class MainController {
 	public void initialize() {
 		listMediaFile.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		resultLabel.setVisible(false);
+
+
 	}
 
 	/**
@@ -191,14 +193,19 @@ public class MainController {
 
 			TimeSeries a1 = new TimeSeries(firstSeries);
 	    	TimeSeries a2 = new TimeSeries(secondSeries);
+
+	    	TimeSeries b1 = new TimeSeries(firstFileMatrix);
+	    	TimeSeries b2 = new TimeSeries(secondFileMatrix);
 	    	
 	      final DistanceFunction distFn = DistanceFunctionFactory.getDistFnByName("EuclideanDistance"); 
 	      
 	      final TimeWarpInfo info = DTWPro.getWarpInfoBetween(a1, a2, distFn);
-	     
-	      System.out.println("Warp Distance Mestre: " + info.getDistance());
 
-			resultLabel.setText("Warp Distance: " + info.getDistance());
+	      final TimeWarpInfo withoutStableAreas = DTWPro.getWarpInfoBetween(b1, b2, distFn);
+	     
+	      System.out.println("Warp Distance Mestre: " + withoutStableAreas.getDistance());
+
+			resultLabel.setText(String.format("Warp Distance: " + info.getDistance(), "%.4d"));
 			resultLabel.setVisible(true);	
 
 		}
@@ -214,7 +221,7 @@ public class MainController {
 	 */
 
 	@FXML
-	private void createStableAreaFile() throws IOException {
+	private void createStableAreaFile() throws IOException, InterruptedException {
 		List<String> selectedFileNames = (List<String>)listMediaFile.getSelectionModel().getSelectedItems();
 		if(stableFileName.getText().equals("")){
 			showMessage(AlertType.WARNING, "Warning", "Error creating file","Insert Surname and Name." );
@@ -228,9 +235,11 @@ public class MainController {
 				XYSeries computedSeriesFile = computedFile.AnalisiFrequenze();
 				listOfComputedFiles.add(computedSeriesFile);
 			}
+
 			double [][] stableAreaMatrix = calculateStableAreas(listOfComputedFiles);
 			writeOnFile(stableAreaMatrix);
 		}
+
 	}
 
 
@@ -305,7 +314,7 @@ public class MainController {
 	 * @return
 	 */
 
-	private double[][] calculateStableAreas(ArrayList<XYSeries> listOfFiles) {
+	private double[][] calculateStableAreas(ArrayList<XYSeries> listOfFiles) throws InterruptedException {
 
 		XYSeries first = listOfFiles.get(0);
 		XYSeries second = listOfFiles.get(1);
@@ -350,7 +359,7 @@ public class MainController {
 			areas[x][2] = distances[x];
 			n+=100;
 		}
-		
+
 		double stableAreas[][] = new double [100][3];
 
 		n = 1;

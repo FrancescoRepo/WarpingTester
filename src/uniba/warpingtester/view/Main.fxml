@@ -102,15 +102,6 @@
                                  </font>
                               </Label>
                               <Button mnemonicParsing="false" onAction="#createStableAreaFile" text="Create Stable Area File" />
-                              <Label fx:id="calculatingLabel" text="Calculating" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                 <GridPane.margin>
-                                    <Insets left="180.0" top="240.0" />
-                                 </GridPane.margin></Label>
-                              <Label fx:id="firstDot" layoutX="512.0" layoutY="524.0" text="." GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                 <GridPane.margin>
-                                    <Insets left="250.0" top="240.0" />
-                                 </GridPane.margin>
-                              </Label>
                            </children>
                         </GridPane>
                      </children>
