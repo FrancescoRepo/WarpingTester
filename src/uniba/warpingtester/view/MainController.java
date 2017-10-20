@@ -1,43 +1,32 @@
 package uniba.warpingtester.view;
 
-
 import java.io.File;
-import java.sql.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.*;
 
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-
-import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
-import org.jfree.data.xy.XYDataItem;
+import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import org.jfree.data.xy.XYSeries;
 
 import dtw.TimeWarpInfo;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.fxml.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.FileChooser.*;
 import timeseries.TimeSeries;
 import uniba.warpingtester.utility.Calcolo;
-import uniba.warpingtester.utility.Coordinates;
-import uniba.warpingtester.utility.DTW;
 import util.DistanceFunction;
 import util.DistanceFunctionFactory;
-import uniba.warpingtester.DTW.DynamicTimeWrapping1D;
-import uniba.warpingtester.DTW.DynamicTimeWrapping2D;
 import uniba.warpingtester.model.WavFile;
 import dtw.DTWPro;
+
+/**
+ * @Class MainController.
+ */
+
 
 public class MainController {
 	
@@ -46,10 +35,15 @@ public class MainController {
 	
 	@FXML
 	private Label resultLabel;
-		
+
+	@FXML
+	private TextField stableFileName;
+
 	private ObservableList<WavFile> mediaFiles = FXCollections.observableArrayList();
 	
 	private HashMap<String, String> fileMap = new HashMap<String, String>();
+
+	private HashMap<String,String> stableFileMap = new HashMap<String,String>();
 	
 	public MainController() {}
 	
@@ -57,7 +51,11 @@ public class MainController {
 		listMediaFile.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		resultLabel.setVisible(false);
 	}
-	
+
+	/**
+	 * Add file using a FileChooser in the software to be analyzed.
+	 */
+
 	@FXML
 	private void addMediaFile() {
 		FileChooser fc = new FileChooser();
@@ -79,7 +77,12 @@ public class MainController {
 		}
 		
 	}
-	
+
+
+	/**
+	 * Remove selected file from the listMediaFile view.
+	 */
+
 	@FXML
 	private void removeMediaFile() {
 		int index = listMediaFile.getSelectionModel().getSelectedIndex();
@@ -95,18 +98,29 @@ public class MainController {
 		}
 		
 	}
-	
+
+	/**
+	 * Calculates distances between two spectrum using DTW.
+	 * It analyze two selected file and prints the distance.
+	 * @throws FileNotFoundException
+	 */
+
 	@FXML
-	private void calculateDistance() {
+	private void calculateDistance() throws FileNotFoundException {
 		List<String> selectedFileNames = (List<String>)listMediaFile.getSelectionModel().getSelectedItems();
+
+		FileChooser fc = new FileChooser();
+		fc.setInitialDirectory(new File("."));
+		fc.setTitle("Add Stable Areas File");
+		fc.getExtensionFilters().clear();
+		fc.getExtensionFilters().add(new ExtensionFilter("Text file","*.txt"));
+
+		List<File> files = fc.showOpenMultipleDialog(null);
+
 				
 		if (selectedFileNames.size() != 2) {
-			Alert alert = new Alert(AlertType.WARNING);
-	        alert.setTitle("Warning");
-	        alert.setHeaderText("Error selecting files.");
-	        alert.setContentText("You must selection 2 file.");
-	        alert.showAndWait();
-		} else {
+			showMessage(AlertType.WARNING, "Warning", "Error creating file","You must select two files" );
+		}else {
 			String pathFirstFile = fileMap.get(selectedFileNames.get(0));
 			String pathSecondFile = fileMap.get(selectedFileNames.get(1));
 			
@@ -127,37 +141,56 @@ public class MainController {
 				listOfComputedFiles.add(computedSeriesFile);
 			}
 			
-			//calculateStableAreas(listOfComputedFiles);
-            correlationWithoutZones(listOfComputedFiles);
-			
+
 			/*
 			 * Creazione di array (serie) float e double per diversi algoritmi DTW
 			 */
 			
-			float[] firstFileMatrix = new float[seriesFirstFile.getItemCount()];
-			float[] secondFileMatrix = new float[seriesSecondFile.getItemCount()];
-			
-			double[] firstFileMatrixd = new double[seriesFirstFile.getItemCount()];
-			double[] secondFileMatrixd = new double[seriesSecondFile.getItemCount()];
+
+			double[] firstFileMatrix = new double[seriesFirstFile.getItemCount()];
+			double[] secondFileMatrix = new double[seriesSecondFile.getItemCount()];
 			
 			
 			for(int i = 0; i < seriesFirstFile.getItemCount();i++) {
-				firstFileMatrix[i] = seriesFirstFile.getY(i).floatValue();
-				firstFileMatrixd[i] = seriesFirstFile.getY(i).doubleValue();
+				firstFileMatrix[i] = seriesFirstFile.getY(i).doubleValue();
 				}
 						
 			for(int i = 0; i < seriesSecondFile.getItemCount(); i++) {
-				secondFileMatrix[i] = seriesSecondFile.getY(i).floatValue();
-				secondFileMatrixd[i] = seriesSecondFile.getY(i).doubleValue();
+				secondFileMatrix[i] = seriesSecondFile.getY(i).doubleValue();
 				}
-			
+
 
 			/*
 			 * DTW Maestre
 			 */
-						
-			TimeSeries a1 = new TimeSeries(firstFileMatrixd);
-	    	TimeSeries a2 = new TimeSeries(secondFileMatrixd);
+
+			double[][] stableMatrix = readFromFile(files.get(0));
+
+			ArrayList<Double> firstRealMatrix = new ArrayList<>();
+			ArrayList<Double> secondRealMatrix = new ArrayList<>();
+			for(int i = 0; i < stableMatrix.length; i++){
+				for(int j = 0; j < seriesFirstFile.getItemCount(); j++){
+					if(seriesFirstFile.getX(j).doubleValue() >= stableMatrix[i][0] && seriesFirstFile.getX(j).doubleValue() <= stableMatrix[i][1]){
+						firstRealMatrix.add(seriesFirstFile.getY(i).doubleValue());
+					}
+					if(seriesSecondFile.getX(j).doubleValue() >= stableMatrix[i][0] && seriesSecondFile.getX(j).doubleValue() <= stableMatrix[i][1]){
+						firstRealMatrix.add(seriesSecondFile.getY(i).doubleValue());
+					}
+				}
+			}
+
+			double[] firstSeries =  new double[firstRealMatrix.size()];
+			double[] secondSeries = new double[firstRealMatrix.size()];
+			for(int i = 0; i < firstRealMatrix.size();i++){
+				firstSeries[i] = firstRealMatrix.get(i).doubleValue();
+			}
+			for(int i = 0; i < secondRealMatrix.size();i++){
+				secondSeries[i] = secondRealMatrix.get(i).doubleValue();
+			}
+
+
+			TimeSeries a1 = new TimeSeries(firstSeries);
+	    	TimeSeries a2 = new TimeSeries(secondSeries);
 	    	
 	      final DistanceFunction distFn = DistanceFunctionFactory.getDistFnByName("EuclideanDistance"); 
 	      
@@ -165,98 +198,114 @@ public class MainController {
 	     
 	      System.out.println("Warp Distance Mestre: " + info.getDistance());
 
-
-		/*
-		 * DTW secondo algoritmo
-		 */
-			
-			DynamicTimeWrapping1D distance = new DynamicTimeWrapping1D(firstFileMatrixd, secondFileMatrixd);
-			
-			System.out.println("Wraping secondo " + distance.calDistance());
-			
 			resultLabel.setText("Warp Distance: " + info.getDistance());
 			resultLabel.setVisible(true);	
-					
 
-			calculateStableAreas(listOfComputedFiles);
-
-			//autoGenerateStableAreas(listOfComputedFiles);
 		}
 		
 	}
 
-	private double[] getMinimumDistance(XYSeries first, XYSeries second){
+	/**
+	 * Analyze spectrum to identify stable zone.
+	 * Call method calculateStableAreas to calculate stable areas of spectrum
+	 * Call method writeOnFile to save those zone in file.
+	 *
+	 * @throws FileNotFoundException
+	 */
 
-		double min = 0;
-		double hz = 0;
-		double position = 0;
-		int i = 8;
-		double sum = 0;
-		int count = 0;
-		while(first.getX(i).doubleValue() < 5500 && first.getX(i).doubleValue() > 50) {
-			double dist = Math.sqrt(Math.pow((first.getX(i).doubleValue() - second.getX(i).doubleValue()), 2) + Math.pow((first.getY(i).doubleValue() - second.getY(i).doubleValue()), 2));
-			if (i == 8) {
-				min = dist;
-				hz = first.getX(i).doubleValue();
-				position = i;
-
-			} else {
-				if (dist < min) {
-					min = dist;
-					hz = first.getX(i).doubleValue();
-					position = i;
-				}
+	@FXML
+	private void createStableAreaFile() throws IOException {
+		List<String> selectedFileNames = (List<String>)listMediaFile.getSelectionModel().getSelectedItems();
+		if(stableFileName.getText().equals("")){
+			showMessage(AlertType.WARNING, "Warning", "Error creating file","Insert Surname and Name." );
+		} else if(selectedFileNames.isEmpty()) {
+			showMessage(AlertType.WARNING, "Warning", "Error creating file","You must select two file." );
+		} else{
+			ArrayList<XYSeries> listOfComputedFiles = new ArrayList<XYSeries>();
+			for (int i = 0; i < selectedFileNames.size(); i++) {
+				String pathFile = fileMap.get(selectedFileNames.get(i));
+				Calcolo computedFile = new Calcolo(pathFile);
+				XYSeries computedSeriesFile = computedFile.AnalisiFrequenze();
+				listOfComputedFiles.add(computedSeriesFile);
 			}
-			sum += dist;
-			count++;
-			i++;
+			double [][] stableAreaMatrix = calculateStableAreas(listOfComputedFiles);
+			writeOnFile(stableAreaMatrix);
 		}
-		double average = sum/count;
-		System.out.println(average + "************************************************");
-
-		double[] result = new double[4];
-		result[0] = min;
-		result[1] = position;
-		result[2] = hz;
-		result[3] = average;
-
-		return result;
 	}
 
-	private void autoGenerateStableAreas(ArrayList<XYSeries> listOfFiles){
 
-		XYSeries first = listOfFiles.get(0);
-		XYSeries second = listOfFiles.get(1);
+	/**
+	 * Writes on file
+	 * @param stableAreaMatrix
+	 * @throws FileNotFoundException
+	 */
 
-		double[] result = getMinimumDistance(first, second);
+	/**
+	 * Save on file stable zone with the following format:
+	 *
+	 * 		LOWER BOUND | HIGHER BOUND | DISTANCE
+	 * 			1		|	  100	   |  6.89..
+	 * 		   1201		|	 1301	   |  9.09..
+	 *
+	 * @param stableAreaMatrix
+	 * @throws FileNotFoundException
+	 */
 
-		double[][] area = new double[3][3];
-		area [0][0] = first.getX((int) result[1] -1).doubleValue();
-		area [0][1] = first.getX((int) result[1] ).doubleValue();
-		area [0][2] = first.getX((int) result[1] +1).doubleValue();
+	private void writeOnFile(double[][] stableAreaMatrix) throws IOException {
+		String name = stableFileName.getText();
+		File stableAreasFile = new File("stablefiles\\" +name + ".txt");
+		stableAreasFile.getParentFile().mkdir();
+		//stableAreasFile.getParentFile().mkdirs();
+		PrintWriter printWriter = new PrintWriter(stableAreasFile);
+		printWriter.flush();
+		for(double[] array: stableAreaMatrix){
+			printWriter.println(array[0] + "|" + array[1] + "|" + array[2]);
+		}
+		printWriter.close();
 
-		area [1][0] = first.getY((int) result[1] -1).doubleValue();
-		area [1][1] = first.getY((int) result[1]).doubleValue();
-		area [1][2] = first.getY((int) result[1] + 1).doubleValue();
-
-		area [2][0] = second.getY((int) result[1] -1 ).doubleValue();
-		area [2][1] = second.getY((int) result[1]).doubleValue();
-		area [2][2] = second.getY((int) result[1] +1).doubleValue();
-
-
-
-		System.out.println(area[0][0] + "\t" + area[0][1] + "\t" + area[0][2]);
-		System.out.println(area[1][0] + "\t" + area[1][1] + "\t" + area[1][2]);
-		System.out.println(area[2][0] + "\t" + area[2][1] + "\t" + area[2][2]);
-
+		if(stableAreasFile.exists()){
+			showMessage(AlertType.INFORMATION, "File created", "","File created and saved in \n" + stableAreasFile.getCanonicalPath() );
+		}
 	}
 
-	
-	private void calculateStableAreas(ArrayList<XYSeries> listOfFiles) {
+	/**
+	 * Reads from file and convert data into matrix of stable zone.
+	 * @param stableFile
+	 * @return
+	 * @throws FileNotFoundException
+	 */
 
-        /**
-         * Metodo per calcolare zone stabili
-          */
+	private double[][] readFromFile(File stableFile) throws FileNotFoundException {
+		Scanner countScanner = new Scanner(stableFile);
+		int lines = 0;
+		while(countScanner.hasNext()){
+			String string = countScanner.nextLine();
+			if (!string.equals("0.0|0.0|0.0")){
+				lines++;
+			}
+		}
+		countScanner.close();
+		Scanner realScanner = new Scanner(stableFile);
+		double [][] stableMatrix = new double[lines][3];
+		for(int i = 0; i< lines; i++){
+			String string = realScanner.nextLine();
+			String array[] = string.split("\\|");
+			stableMatrix[i][0] = Double.parseDouble(array[0]);
+			stableMatrix[i][1] = Double.parseDouble(array[1]);
+			stableMatrix[i][2] = Double.parseDouble(array[2]);
+		}
+		return stableMatrix;
+	}
+
+	/**
+	 * Calculate stable areas of two spectrums.
+	 * It devides the spectrum in 100 Hz areas and calculate the distance within those areas.
+	 * Next calculate the average distance and identify as stable zone those who have the distance lower than the average.
+	 * @param listOfFiles
+	 * @return
+	 */
+
+	private double[][] calculateStableAreas(ArrayList<XYSeries> listOfFiles) {
 
 		XYSeries first = listOfFiles.get(0);
 		XYSeries second = listOfFiles.get(1);
@@ -290,23 +339,10 @@ public class MainController {
 			sum+=dist;
 		}
 
-        /**
-         * Calcola media distanza media tra tutte le zone
-         */
-
         double average = sum/distances.length;
 
 		int n = 1;
 		double areas[][] = new double [100][3];
-
-        /*
-		 * Calcola la seguente matrice
-		 *
-		 * 			|LowerBound | HigherBound |Distance|
-		 * 			| 0         |   100       | 12     |
-		 * 			| 101       |   200       | 0      |
-		 *
-		 */
 
 		for (int x = 0; x < distances.length; x++) {
 			areas[x][0] = n;
@@ -316,15 +352,6 @@ public class MainController {
 		}
 		
 		double stableAreas[][] = new double [100][3];
-
-         /*
-		 * Calcola la matrice delle zone stabili
-		 *
-		 * 			|LowerBound | HigherBound |Distance|
-		 * 			| 0         |   100       | 12     |
-		 * 			| 101       |   200       | 0      |
-		 *
-		 */
 
 		n = 1;
 		int index = 0;
@@ -340,6 +367,20 @@ public class MainController {
 			}
 		}
 
+		// print result on console
+		//testMethod(average, areas, stableAreas);
+
+		return stableAreas;
+	}
+
+	/**
+	 * Prints all results in console.
+	 * @param average
+	 * @param areas
+	 * @param stableAreas
+	 */
+
+	private void testMethod(double average, double[][] areas, double[][] stableAreas) {
 		System.out.println("**********************" + average);
 		System.out.println("************************************************************************ ZONE");
 
@@ -354,50 +395,12 @@ public class MainController {
 		}
 	}
 
-	private void correlationWithoutZones(ArrayList<XYSeries> listOfFiles) {
-
-        /**
-         * Correlazione tra tutti i file.
-         * 1. Calcola la correlazione tra i due punti per ogni punto Y
-         * 2. Se la correlazione compresa nell'intervallo [-1, -0.95] U [0.95, 1] "salva" i valori
-         * 3. Calcola la correlazione tra i valori compresi all'interno di quel range.
-         *
-         *
-         */
-
-        XYSeries first = listOfFiles.get(0);
-		XYSeries second = listOfFiles.get(1);
-
-		double[] firstValue = new double[2];
-		double[] secondValue = new double[2];
-		ArrayList<Double> s1_arr = new ArrayList<>();
-		ArrayList<Double> s2_arr = new ArrayList<>();
-		PearsonsCorrelation p = new PearsonsCorrelation();
-
-
-		for(int j = 0; j < first.getItemCount(); j++) {
-            if(first.getX(j).doubleValue() < 5500) {
-                firstValue[0] = first.getY(j).doubleValue();
-                secondValue[0] = second.getY(j).doubleValue();
-                double corr = p.correlation(firstValue, secondValue);
-                if (corr < -0.95 || corr > 0.95) {
-                    s1_arr.add(firstValue[0]);
-                    s2_arr.add(secondValue[0]);
-                }
-            }
-		}
-
-        double[] s1_official = new double[s1_arr.size()];
-        double[] s2_official = new double[s2_arr.size()];
-
-        for(int i = 0; i < s1_arr.size(); i++){
-            s1_official[i] = s1_arr.get(i);
-            s2_official[i] = s2_arr.get(i);
-        }
-
-        System.out.println("Indice di correlazione " + p.correlation(s1_official, s2_official));
-
+	private void showMessage(AlertType type, String title, String headerText, String contentText) {
+		Alert alert = new Alert(type);
+		alert.setTitle(title);
+		alert.setHeaderText(headerText);
+		alert.setContentText(contentText);
+		alert.showAndWait();
 	}
-	
 }
 
