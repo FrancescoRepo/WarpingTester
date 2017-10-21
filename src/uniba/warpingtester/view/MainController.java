@@ -316,10 +316,10 @@ public class MainController {
 		XYSeries first = listOfFiles.get(0);
 		XYSeries second = listOfFiles.get(1);
 		
-		double[] distances = new double[56];
+		double[] distances = new double[55];
 		
 		int counter;
-		int aaa = 0;
+		int k = 0;
 		int i = 1;
 		while(i < 5500) {
 			double[] s1 = new double[13];
@@ -334,8 +334,8 @@ public class MainController {
 			}
 			
 			final TimeWarpInfo info = DTWPro.getWarpInfoBetween(new TimeSeries(s1), new TimeSeries(s2), (DistanceFunctionFactory.getDistFnByName("EuclideanDistance")));
-			distances[aaa] = info.getDistance();
-			aaa++;
+			distances[k] = info.getDistance();
+			k++;
 			i = i+100;
 		}
 
@@ -346,26 +346,21 @@ public class MainController {
 		}
 
         double average = sum/distances.length;
+		int cntStableZone = 0;
 
-		int n = 1;
-		double areas[][] = new double [100][3];
-
-		for (int x = 0; x < distances.length; x++) {
-			areas[x][0] = n;
-			areas[x][1] = n+99;
-			areas[x][2] = distances[x];
-			n+=100;
+		for(i = 0; i < distances.length; i++) {
+			if(distances[i] < average) cntStableZone++;
 		}
 
-		double stableAreas[][] = new double [100][3];
-
-		n = 1;
+		double stableAreas[][] = new double [cntStableZone][3];
+		int n = 1;
 		int index = 0;
-		for (int x = 0; x < distances.length; x++) {
-			if(distances[x] < average) {
+
+		for (i = 0; i < distances.length; i++) {
+			if(distances[i] < average) {
 				stableAreas[index][0] = n;
 				stableAreas[index][1] = n+99;
-				stableAreas[index][2] = distances[x];
+				stableAreas[index][2] = distances[i];
 				n+=100;
 				index++;
 			} else {
