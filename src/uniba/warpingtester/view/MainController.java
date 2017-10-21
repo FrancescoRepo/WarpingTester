@@ -20,7 +20,6 @@ import timeseries.TimeSeries;
 import uniba.warpingtester.utility.Calcolo;
 import util.DistanceFunction;
 import util.DistanceFunctionFactory;
-import uniba.warpingtester.model.WavFile;
 import dtw.DTWPro;
 
 /**
@@ -39,12 +38,9 @@ public class MainController {
 	@FXML
 	private TextField stableFileName;
 
-	private ObservableList<WavFile> mediaFiles = FXCollections.observableArrayList();
-	
+
 	private HashMap<String, String> fileMap = new HashMap<String, String>();
 
-	private HashMap<String,String> stableFileMap = new HashMap<String,String>();
-	
 	public MainController() {}
 	
 	public void initialize() {
@@ -264,7 +260,6 @@ public class MainController {
 		String name = stableFileName.getText();
 		File stableAreasFile = new File("stablefiles\\" +name + ".txt");
 		stableAreasFile.getParentFile().mkdir();
-		//stableAreasFile.getParentFile().mkdirs();
 		PrintWriter printWriter = new PrintWriter(stableAreasFile);
 		printWriter.flush();
 		for(double[] array: stableAreaMatrix){
