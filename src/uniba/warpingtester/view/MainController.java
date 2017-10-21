@@ -67,7 +67,7 @@ public class MainController {
 		if (files != null) {
 			for(File f : files) fileMap.putIfAbsent(f.getName(), f.getPath());
 			
-			List<String> fileNames = new ArrayList<String>();
+			List<String> fileNames = new ArrayList<>();
 			for (String s : fileMap.keySet()) fileNames.add(s);		
 			ObservableList names = FXCollections.observableArrayList(fileNames);
 			Collections.sort(names);
@@ -224,7 +224,7 @@ public class MainController {
 		} else if(selectedFileNames.isEmpty()) {
 			showMessage(AlertType.WARNING, "Warning", "Error creating file","You must select two file." );
 		} else{
-			ArrayList<XYSeries> listOfComputedFiles = new ArrayList<XYSeries>();
+			ArrayList<XYSeries> listOfComputedFiles = new ArrayList<>();
 			for (int i = 0; i < selectedFileNames.size(); i++) {
 				String pathFile = fileMap.get(selectedFileNames.get(i));
 				Calcolo computedFile = new Calcolo(pathFile);
