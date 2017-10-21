@@ -84,9 +84,11 @@ public class MainController {
 	@FXML
 	private void removeMediaFile() {
 		int index = listMediaFile.getSelectionModel().getSelectedIndex();
-		
+		Object fileToRemove = listMediaFile.getSelectionModel().getSelectedItem();
+
 		if(index >= 0) {
-			listMediaFile.getItems().remove(index);	
+			listMediaFile.getItems().remove(index);
+			fileMap.remove(fileToRemove);
 		} else {
 			Alert alert = new Alert(AlertType.WARNING);
 			alert.setTitle("Warning");
