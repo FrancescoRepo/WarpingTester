@@ -222,7 +222,7 @@ public class MainController {
 	private void createStableAreaFile() throws IOException, InterruptedException {
 		List<String> selectedFileNames = (List<String>)listMediaFile.getSelectionModel().getSelectedItems();
 		if(stableFileName.getText().equals("")){
-			showMessage(AlertType.WARNING, "Warning", "Error creating file","Insert Surname and Name." );
+			showMessage(AlertType.WARNING, "Warning", "Error creating file","Insert Name and Surname." );
 		} else if(selectedFileNames.isEmpty()) {
 			showMessage(AlertType.WARNING, "Warning", "Error creating file", "You must select two file.");
 		} else if(selectedFileNames.size() < 2) {
