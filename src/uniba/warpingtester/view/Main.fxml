@@ -101,7 +101,7 @@
                                                 <Font size="18.0" />
                                              </font>
                                           </Label>
-                                          <Label layoutX="78.0" prefHeight="85.0" prefWidth="417.0" text="Questa sezione consente di calcolare la distanza DTW di due profili spettrali.&#10;Istruzioni:&#10;1) Selezionare due file audio &quot;.wav&quot;&#10;2) Premere sul pulsante &quot;Calculate Distance&quot;">
+                                          <Label layoutX="78.0" prefHeight="85.0" prefWidth="444.0" text="Questa sezione consente di calcolare la distanza DTW di due profili spettrali.&#10;Istruzioni:&#10;1) Selezionare due file audio &quot;.wav&quot;&#10;2) Premere sul pulsante &quot;Calculate Distance&quot;">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
                                              </font>
