@@ -224,7 +224,9 @@ public class MainController {
 		if(stableFileName.getText().equals("")){
 			showMessage(AlertType.WARNING, "Warning", "Error creating file","Insert Surname and Name." );
 		} else if(selectedFileNames.isEmpty()) {
-			showMessage(AlertType.WARNING, "Warning", "Error creating file","You must select two file." );
+			showMessage(AlertType.WARNING, "Warning", "Error creating file", "You must select two file.");
+		} else if(selectedFileNames.size() < 2) {
+			showMessage(AlertType.WARNING, "Warning", "Error creating file", "You must select two file.");
 		} else{
 			ArrayList<XYSeries> listOfComputedFiles = new ArrayList<>();
 			for (int i = 0; i < selectedFileNames.size(); i++) {

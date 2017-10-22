@@ -1,22 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.text.Font?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uniba.warpingtester.view.MainController">
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uniba.warpingtester.view.MainController">
    <children>
       <BorderPane layoutX="20.0" layoutY="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
@@ -79,29 +69,47 @@
                         <GridPane GridPane.columnIndex="1" GridPane.rowIndex="1">
                           <columnConstraints>
                             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                           </columnConstraints>
                           <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="314.0" minHeight="10.0" prefHeight="291.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="357.0" minHeight="10.0" prefHeight="245.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <TextField fx:id="stableFileName" promptText="Surname Name" GridPane.columnIndex="1">
-                                 <GridPane.margin>
-                                    <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
-                                 </GridPane.margin>
-                              </TextField>
-                              <Button mnemonicParsing="false" onAction="#calculateDistance" prefHeight="25.0" prefWidth="170.0" text="Calculate Distance" GridPane.halignment="CENTER" GridPane.rowIndex="1">
-                                 <GridPane.margin>
-                                    <Insets />
-                                 </GridPane.margin>
-                              </Button>
-                              <Label fx:id="resultLabel" text="Label" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
-                                 <font>
-                                    <Font size="18.0" />
-                                 </font>
-                              </Label>
-                              <Button mnemonicParsing="false" onAction="#createStableAreaFile" text="Create Stable Area File" />
+                              <TitledPane animated="false" collapsible="false" prefHeight="297.0" prefWidth="588.0" text="Zone Stabili">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <Label alignment="CENTER" layoutX="85.0" text="Questa sezione consente di calcolare le zone stabili di un profilo spettrale.&#10;Istruzioni:&#10;1) Selezionare file audio &quot;.wav&quot;&#10;2) Inserire Nome e Cognome&#10;3) Premere il pulsante &quot;Create Stable Area File&quot;">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <Button layoutX="185.0" layoutY="185.0" mnemonicParsing="false" onAction="#createStableAreaFile" prefHeight="25.0" prefWidth="212.0" text="Create Stable Area File" />
+                                          <Label layoutX="221.0" layoutY="116.0" text="Inserire Nome e Cognome" />
+                                          <TextField fx:id="stableFileName" alignment="CENTER" layoutX="184.0" layoutY="133.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="218.0" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </TitledPane>
+                              <TitledPane animated="false" collapsible="false" prefHeight="252.0" prefWidth="588.0" text="Distanza DTW" GridPane.rowIndex="1">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <Button layoutX="208.0" layoutY="110.0" mnemonicParsing="false" onAction="#calculateDistance" prefHeight="25.0" prefWidth="170.0" text="Calculate Distance" />
+                                          <Label fx:id="resultLabel" contentDisplay="CENTER" layoutX="272.0" layoutY="149.0" text="Label">
+                                             <font>
+                                                <Font size="18.0" />
+                                             </font>
+                                          </Label>
+                                          <Label layoutX="78.0" prefHeight="85.0" prefWidth="417.0" text="Questa sezione consente di calcolare la distanza DTW di due profili spettrali.&#10;Istruzioni:&#10;1) Selezionare due file audio &quot;.wav&quot;&#10;2) Premere sul pulsante &quot;Calculate Distance&quot;">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </TitledPane>
                            </children>
                         </GridPane>
                      </children>
