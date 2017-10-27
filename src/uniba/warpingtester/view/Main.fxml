@@ -96,7 +96,7 @@
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
                                           <Button layoutX="208.0" layoutY="110.0" mnemonicParsing="false" onAction="#calculateDistance" prefHeight="25.0" prefWidth="170.0" text="Calculate Distance" />
-                                          <Label fx:id="resultLabel" contentDisplay="CENTER" layoutX="272.0" layoutY="149.0" text="Label">
+                                          <Label fx:id="resultLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="133.0" layoutY="149.0" style="-fx-text-alignment: center;" text="Label">
                                              <font>
                                                 <Font size="18.0" />
                                              </font>
